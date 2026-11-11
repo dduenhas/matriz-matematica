@@ -13,8 +13,10 @@ type BoardProps = {
 
 export function Board({ picture, cells, paint, marks, won, selected, onCell }: BoardProps) {
   return (
-    <div className="board-wrap">
+    <div className="board-wrap" id="matriz" tabIndex={-1}>
       <div
+        role="group"
+        aria-label="Matriz de contas. Escolha uma cor e pinte a casa do resultado."
         className={won ? "grid won" : "grid"}
         style={{ ["--cols" as string]: picture.cols, ["--rows" as string]: picture.rows }}
       >

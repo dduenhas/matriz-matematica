@@ -37,12 +37,29 @@ button:focus-visible,
 }
 
 .page {
+  position: relative;
   height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 10px 16px 12px;
   overflow: hidden;
+}
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  z-index: 6;
+  transform: translateY(-140%);
+  background: #241c16;
+  color: #fffdf8;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.skip:focus {
+  transform: none;
 }
 
 .top {
@@ -547,6 +564,172 @@ legend {
 .dialog-actions .ghost {
   width: auto;
   min-width: 140px;
+}
+
+.dialog-read {
+  width: min(960px, 100%);
+}
+
+.readable,
+.dialog-read p,
+.dialog-read li,
+.dialog-read td,
+.dialog-read th,
+.dialog-read caption {
+  user-select: text;
+  cursor: text;
+}
+
+.dialog-read h2,
+.dialog-read h3 {
+  user-select: text;
+}
+
+.dialog-read button,
+.dialog-read label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.dialog-read h3 {
+  margin: 18px 0 8px;
+  font-size: 20px;
+}
+
+.skill-table {
+  overflow: auto;
+  max-width: 100%;
+  border: 2px solid #241c16;
+  border-radius: 12px;
+}
+
+.skill-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fffdf8;
+}
+
+.skill-table th,
+.skill-table td {
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e4d8c4;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.skill-table th {
+  background: #fff4d8;
+}
+
+.skill-axis {
+  font-weight: 800;
+}
+
+.copy-note {
+  flex: 1;
+  min-height: 1.3em;
+  margin: 0;
+}
+
+.a11y-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.a11y-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  font-size: 18px;
+}
+
+.a11y-option input {
+  width: 22px;
+  height: 22px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+html[data-text="large"] {
+  font-size: 118%;
+}
+
+html[data-text="large"] .expr {
+  font-size: min(22px, 36cqmin);
+}
+
+html[data-contrast="high"] {
+  background: #fff;
+  color: #000;
+}
+
+html[data-contrast="high"] body,
+html[data-contrast="high"] .page,
+html[data-contrast="high"] .dialog {
+  background: #fff;
+  color: #000;
+}
+
+html[data-contrast="high"] .hint,
+html[data-contrast="high"] .dialog-note,
+html[data-contrast="high"] .abacus-total span {
+  color: #000;
+}
+
+html[data-contrast="high"] .icon,
+html[data-contrast="high"] .ghost,
+html[data-contrast="high"] .eraser,
+html[data-contrast="high"] .swatch,
+html[data-contrast="high"] .choice,
+html[data-contrast="high"] .table,
+html[data-contrast="high"] .theme,
+html[data-contrast="high"] .abacus,
+html[data-contrast="high"] .grid {
+  border-color: #000;
+  background: #fff;
+}
+
+html[data-contrast="high"] .cell {
+  box-shadow: inset 0 0 0 2px #000;
+}
+
+html[data-contrast="high"] button:focus-visible,
+html[data-contrast="high"] .dialog:focus-visible,
+html[data-contrast="high"] .rod:focus-visible,
+html[data-contrast="high"] .skip:focus {
+  outline: 4px solid #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation: none !important;
+  transition: none !important;
 }
 
 .confetti i {

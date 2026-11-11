@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Abacus } from "./components/Abacus";
+import { AccessibilityDialog } from "./components/AccessibilityDialog";
 import { Board } from "./components/Board";
 import { Palette } from "./components/Palette";
+import { PedagogyDialog } from "./components/PedagogyDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
+import { applyA11y, loadA11y, saveA11y, type A11yPrefs } from "./game/a11y";
 import { generatePuzzle } from "./game/generate";
 import { firstPictureId, nextPictureId, phaseOf, pictureById } from "./game/pictures";
 import { loadSettings, saveSettings } from "./game/storage";
@@ -31,6 +34,9 @@ export function App() {
   const [message, setMessage] = useState<string | null>(null);
   const [abacus, setAbacus] = useState([0, 0]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pedagogyOpen, setPedagogyOpen] = useState(false);
+  const [a11yOpen, setA11yOpen] = useState(false);
+  const [a11y, setA11y] = useState<A11yPrefs>(loadA11y);
   const advanceTimer = useRef<number | null>(null);
 
   function cancelAdvance() {
@@ -41,6 +47,11 @@ export function App() {
   }
 
   useEffect(() => cancelAdvance, []);
+
+  useEffect(() => {
+    applyA11y(a11y);
+    saveA11y(a11y);
+  }, [a11y]);
 
   function start(next: Settings) {
     cancelAdvance();
@@ -131,6 +142,9 @@ export function App() {
 
   return (
     <div className="page">
+      <a className="skip" href="#matriz">
+        Ir para a matriz
+      </a>
       <header className="top">
         <div>
           <h1>Matriz Matemática</h1>
@@ -147,7 +161,37 @@ export function App() {
           <button
             type="button"
             className="icon"
+            aria-label="Acessibilidade"
+            aria-haspopup="dialog"
+            aria-expanded={a11yOpen}
+            onClick={() => setA11yOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="4.5" r="2" fill="currentColor" />
+              <path fill="currentColor" d="M4 9.2h16v2.1h-6.1V20h-2.2v-5.2H9.6V20H7.4v-8.7H4V9.2Z" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="icon"
+            aria-label="Fundamentação pedagógica"
+            aria-haspopup="dialog"
+            aria-expanded={pedagogyOpen}
+            onClick={() => setPedagogyOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 3 1.5 8.7 12 14.4l8.2-4.5V16h2.1V8.7L12 3Zm0 8.7L6.2 8.7 12 5.5l5.8 3.2-5.8 3Zm-5.2.4V16c0 1.9 2.4 3.5 5.2 3.5s5.2-1.6 5.2-3.5v-3.9l-5.2 2.8-5.2-2.8Z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="icon"
             aria-label="Configurações"
+            aria-haspopup="dialog"
+            aria-expanded={settingsOpen}
             onClick={() => setSettingsOpen(true)}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -221,6 +265,10 @@ export function App() {
 
       {settingsOpen && (
         <SettingsDialog settings={settings} onCancel={() => setSettingsOpen(false)} onApply={start} />
+      )}
+      {pedagogyOpen && <PedagogyDialog onClose={() => setPedagogyOpen(false)} />}
+      {a11yOpen && (
+        <AccessibilityDialog prefs={a11y} onChange={setA11y} onClose={() => setA11yOpen(false)} />
       )}
     </div>
   );

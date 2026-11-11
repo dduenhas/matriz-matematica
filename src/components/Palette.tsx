@@ -12,7 +12,7 @@ type PaletteProps = {
 
 export function Palette({ palette, tool, message, won, onTool, onVerify, onClear }: PaletteProps) {
   return (
-    <aside className="palette">
+    <aside className="palette" aria-label="Cores dos resultados">
       <div className="swatches">
         {palette.map((entry) => (
           <button

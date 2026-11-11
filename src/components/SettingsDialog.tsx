@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { pictureById, themes } from "../game/pictures";
 import type { Operation, Settings } from "../game/types";
 import { PicturePreview } from "./PicturePreview";
+import { useModalDialog } from "./useModalDialog";
 
 const sizes = [
   { id: 8, label: "8×8" },
@@ -31,13 +32,9 @@ export function SettingsDialog({
 }) {
   const [draft, setDraft] = useState(settings);
   const [size, setSize] = useState<SizeId>(sizeOf(settings.pictureId));
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useModalDialog(onCancel);
   const theme = themeOf(draft.pictureId);
   const canPlay = draft.operation === "sum" || draft.tables.length > 0;
-
-  useEffect(() => {
-    dialogRef.current?.focus();
-  }, []);
 
   function chooseSize(next: SizeId) {
     setSize(next);
@@ -62,7 +59,12 @@ export function SettingsDialog({
   }
 
   return (
-    <div className="overlay" onMouseDown={onCancel}>
+    <div
+      className="overlay"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onCancel();
+      }}
+    >
       <div
         className="dialog"
         role="dialog"
@@ -71,9 +73,6 @@ export function SettingsDialog({
         tabIndex={-1}
         ref={dialogRef}
         onMouseDown={(event) => event.stopPropagation()}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") onCancel();
-        }}
       >
         <h2 id="settings-title">Configurações</h2>
         <p className="dialog-note">Isso começa uma partida nova.</p>

@@ -27,12 +27,26 @@ function Rod({ count, onChange }: { count: number; onChange: (count: number) => 
         aria-valuemin={0}
         aria-valuemax={10}
         aria-valuenow={count}
+        aria-valuetext={`${count} de 10 contas contadas`}
+        aria-keyshortcuts="ArrowLeft ArrowRight Home End"
         aria-label="Haste do ábaco"
         onKeyDown={(event) => {
-          if (event.key === "ArrowLeft") onChange(clamp(count + 1));
-          if (event.key === "ArrowRight") onChange(clamp(count - 1));
-          if (event.key === "Home") onChange(0);
-          if (event.key === "End") onChange(10);
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            onChange(clamp(count + 1));
+          }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            onChange(clamp(count - 1));
+          }
+          if (event.key === "Home") {
+            event.preventDefault();
+            onChange(0);
+          }
+          if (event.key === "End") {
+            event.preventDefault();
+            onChange(10);
+          }
         }}
         onPointerDown={(event) => {
           const bead = (event.target as HTMLElement).closest<HTMLElement>("[data-bead]");
