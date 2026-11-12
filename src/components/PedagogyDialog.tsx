@@ -7,6 +7,12 @@ function SkillTable({ rows }: { rows: SkillRow[] }) {
     <div className="skill-table">
       <table>
         <caption className="visually-hidden">Habilidades, texto oficial e relação com o jogo</caption>
+        <colgroup>
+          <col className="code" />
+          <col className="year" />
+          <col />
+          <col />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col">Código</th>

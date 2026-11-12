@@ -467,16 +467,21 @@ h1 {
   position: fixed;
   inset: 0;
   background: rgba(36, 28, 22, 0.45);
-  display: grid;
-  place-items: center;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px 16px;
   z-index: 5;
 }
 
 .dialog {
   width: min(760px, 100%);
-  max-height: min(92vh, 900px);
-  overflow: auto;
+  max-width: 100%;
+  flex: 0 0 auto;
+  margin-block: auto;
+  scroll-margin-block: 24px;
   background: #fffdf8;
   border-radius: 20px;
   padding: 18px;
@@ -597,7 +602,6 @@ legend {
 }
 
 .skill-table {
-  overflow: auto;
   max-width: 100%;
   border: 2px solid #241c16;
   border-radius: 12px;
@@ -605,8 +609,17 @@ legend {
 
 .skill-table table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   background: #fffdf8;
+}
+
+.skill-table col.code {
+  width: 7.2rem;
+}
+
+.skill-table col.year {
+  width: 3.4rem;
 }
 
 .skill-table th,
