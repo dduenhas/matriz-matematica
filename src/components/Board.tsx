@@ -32,11 +32,14 @@ export function Board({ picture, cells, paint, marks, won, calling, selected, on
       >
         {cells.map((entry, index) => {
           const painted = paint[index];
+          const correct = painted === entry.colorKey;
           const background = painted ? picture.colors[painted] : undefined;
           const mark = marks[index];
+          const showExpr = !won && !correct;
           const className = [
             "cell",
             painted ? "painted" : "",
+            correct ? "correct" : "",
             selected === index ? "selected" : "",
             mark === "wrong" ? "wrong" : "",
             mark === "empty" ? "empty" : "",
@@ -58,11 +61,15 @@ export function Board({ picture, cells, paint, marks, won, calling, selected, on
               aria-hidden={won || undefined}
               aria-pressed={selected === index}
               aria-label={
-                painted ? `${entry.problem.label}, pintada` : `${entry.problem.label}, sem cor`
+                correct
+                  ? `${entry.problem.label}, cor certa`
+                  : painted
+                    ? `${entry.problem.label}, cor errada`
+                    : `${entry.problem.label}, sem cor`
               }
               onClick={() => onCell(index)}
             >
-              {won ? "" : <span className="expr">{entry.problem.label}</span>}
+              {showExpr ? <span className="expr">{entry.problem.label}</span> : null}
             </button>
           );
         })}
