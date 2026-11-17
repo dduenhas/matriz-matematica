@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { Abacus } from "./components/Abacus";
 import { AccessibilityDialog } from "./components/AccessibilityDialog";
 import { Board } from "./components/Board";
+import { MagicReveal } from "./components/MagicReveal";
 import { Palette } from "./components/Palette";
 import { PedagogyDialog } from "./components/PedagogyDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { applyA11y, loadA11y, saveA11y, type A11yPrefs } from "./game/a11y";
+import { artFor } from "./game/art";
 import { generatePuzzle } from "./game/generate";
 import { firstPictureId, nextPictureId, phaseOf, pictureById } from "./game/pictures";
+import { playMagicCall, playReveal } from "./game/sound";
 import { loadSettings, saveSettings } from "./game/storage";
 import type { Mark, Puzzle, Settings } from "./game/types";
 
@@ -37,16 +40,18 @@ export function App() {
   const [pedagogyOpen, setPedagogyOpen] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
   const [a11y, setA11y] = useState<A11yPrefs>(loadA11y);
-  const advanceTimer = useRef<number | null>(null);
+  const [magic, setMagic] = useState<"calling" | "revealed" | "seen" | null>(null);
+  const [revealFrom, setRevealFrom] = useState<DOMRect | null>(null);
+  const callTimer = useRef<number | null>(null);
 
-  function cancelAdvance() {
-    if (advanceTimer.current !== null) {
-      window.clearTimeout(advanceTimer.current);
-      advanceTimer.current = null;
+  function cancelCall() {
+    if (callTimer.current !== null) {
+      window.clearInterval(callTimer.current);
+      callTimer.current = null;
     }
   }
 
-  useEffect(() => cancelAdvance, []);
+  useEffect(() => cancelCall, []);
 
   useEffect(() => {
     applyA11y(a11y);
@@ -54,7 +59,9 @@ export function App() {
   }, [a11y]);
 
   function start(next: Settings) {
-    cancelAdvance();
+    cancelCall();
+    setMagic(null);
+    setRevealFrom(null);
     const generated = makePuzzle(next);
     setSettings(next);
     saveSettings(next);
@@ -106,14 +113,18 @@ export function App() {
     if (empty === 0 && wrong === 0) {
       setWon(true);
       setMessage(null);
-      const nextId = nextPictureId(settings.pictureId);
-      if (nextId) {
-        cancelAdvance();
-        advanceTimer.current = window.setTimeout(() => {
-          advanceTimer.current = null;
-          start({ ...settings, pictureId: nextId });
-        }, 1600);
-      }
+      setSelected(null);
+      setMagic("calling");
+      const art = artFor(puzzle.picture.theme);
+      if (art) new Image().src = art;
+      playMagicCall();
+      cancelCall();
+      let repeats = 0;
+      callTimer.current = window.setInterval(() => {
+        repeats += 1;
+        playMagicCall();
+        if (repeats >= 3) cancelCall();
+      }, 6000);
       return;
     }
     if (empty > 0 && wrong > 0) {
@@ -132,9 +143,24 @@ export function App() {
     setMessage(null);
   }
 
+  function castWand(from: DOMRect) {
+    cancelCall();
+    setRevealFrom(from);
+    setMagic("revealed");
+    playReveal();
+  }
+
+  function goNext() {
+    start({
+      ...settings,
+      pictureId: upcoming?.id ?? firstPictureId(settings.pictureId),
+    });
+  }
+
   const phase = phaseOf(settings.pictureId);
   const upcomingId = nextPictureId(settings.pictureId);
   const upcoming = upcomingId ? pictureById(upcomingId) : undefined;
+  const art = artFor(puzzle.picture.theme);
   const selectedCell = selected === null ? null : puzzle.cells[selected];
   const prompt = selectedCell
     ? `Quanto é ${selectedCell.problem.a} + ${selectedCell.problem.b}?`
@@ -212,22 +238,17 @@ export function App() {
             ))}
           </div>
           <p>
-            {upcoming
-              ? `Você completou o ${puzzle.picture.title.toLowerCase()}! Próxima fase: ${upcoming.title}.`
-              : "Você completou todas as fases!"}
+            {magic === "calling"
+              ? `Você completou o ${puzzle.picture.title.toLowerCase()}! Toque no desenho com a varinha mágica.`
+              : upcoming
+                ? `Você completou o ${puzzle.picture.title.toLowerCase()}! Próxima fase: ${upcoming.title}.`
+                : "Você completou todas as fases!"}
           </p>
-          <button
-            type="button"
-            className="verify"
-            onClick={() =>
-              start({
-                ...settings,
-                pictureId: upcoming?.id ?? firstPictureId(settings.pictureId),
-              })
-            }
-          >
-            {upcoming ? "Próxima fase" : "Jogar de novo"}
-          </button>
+          {magic !== "calling" && (
+            <button type="button" className="verify" onClick={goNext}>
+              {upcoming ? "Próxima fase" : "Jogar de novo"}
+            </button>
+          )}
         </div>
       )}
 
@@ -238,8 +259,10 @@ export function App() {
           paint={paint}
           marks={marks}
           won={won}
+          calling={magic === "calling"}
           selected={selected}
           onCell={onCell}
+          onMagic={castWand}
         />
         <Palette
           palette={puzzle.palette}
@@ -265,6 +288,16 @@ export function App() {
 
       {settingsOpen && (
         <SettingsDialog settings={settings} onCancel={() => setSettingsOpen(false)} onApply={start} />
+      )}
+      {magic === "revealed" && art && (
+        <MagicReveal
+          picture={puzzle.picture}
+          image={art}
+          from={revealFrom}
+          nextLabel={upcoming ? "Próxima fase" : "Jogar de novo"}
+          onNext={goNext}
+          onClose={() => setMagic("seen")}
+        />
       )}
       {pedagogyOpen && <PedagogyDialog onClose={() => setPedagogyOpen(false)} />}
       {a11yOpen && (
