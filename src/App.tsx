@@ -151,6 +151,14 @@ export function App() {
     setClearOpen(false);
   }
 
+  function restartFromFirstPhase() {
+    setClearOpen(false);
+    start({
+      ...settings,
+      pictureId: firstPictureId(settings.pictureId),
+    });
+  }
+
   function castWand(from: DOMRect) {
     cancelCall();
     setRevealFrom(from);
@@ -182,10 +190,17 @@ export function App() {
       <header className="top">
         <div>
           <h1>Matriz Matemática</h1>
-          <p className="mode">
-            Fase {phase.index + 1} de {phase.total} · {modeLabel(settings)} · {puzzle.picture.title} ·{" "}
-            {puzzle.picture.cols}×{puzzle.picture.rows}
-          </p>
+          <button
+            type="button"
+            className="mode stealth-link"
+            aria-label={`Fase ${phase.index + 1} de ${phase.total}. Abrir configurações`}
+            aria-haspopup="dialog"
+            aria-expanded={settingsOpen}
+            onClick={() => setSettingsOpen(true)}
+          >
+            Fase {phase.index + 1} de {phase.total} · {modeLabel(settings)} · {puzzle.picture.cols}×
+            {puzzle.picture.rows}
+          </button>
           <p className="hint">Calcule e pinte com a cor do resultado.</p>
         </div>
         <div className="top-actions">
@@ -262,9 +277,9 @@ export function App() {
           </div>
           <p>
             {magic === "calling"
-              ? `Você completou o ${puzzle.picture.title.toLowerCase()}! Toque no desenho com a varinha mágica.`
+              ? "Você completou o desenho! Toque nele com a varinha mágica."
               : upcoming
-                ? `Você completou o ${puzzle.picture.title.toLowerCase()}! Próxima fase: ${upcoming.title}.`
+                ? "Você completou o desenho! Prepare-se para a próxima fase."
                 : "Você completou todas as fases!"}
           </p>
           {magic !== "calling" && (
@@ -312,7 +327,11 @@ export function App() {
         <SettingsDialog settings={settings} onCancel={() => setSettingsOpen(false)} onApply={start} />
       )}
       {clearOpen && (
-        <ClearProgressDialog onCancel={() => setClearOpen(false)} onConfirm={clearProgress} />
+        <ClearProgressDialog
+          onCancel={() => setClearOpen(false)}
+          onConfirm={clearProgress}
+          onRestart={restartFromFirstPhase}
+        />
       )}
       {magic === "revealed" && art && (
         <MagicReveal

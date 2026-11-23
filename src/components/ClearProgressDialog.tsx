@@ -3,9 +3,11 @@ import { useModalDialog } from "./useModalDialog";
 export function ClearProgressDialog({
   onCancel,
   onConfirm,
+  onRestart,
 }: {
   onCancel: () => void;
   onConfirm: () => void;
+  onRestart: () => void;
 }) {
   const dialogRef = useModalDialog(onCancel);
 
@@ -28,7 +30,8 @@ export function ClearProgressDialog({
       >
         <h2 id="clear-title">Limpar o progresso?</h2>
         <p id="clear-note" className="dialog-note">
-          Isso apaga todas as cores da matriz e o que você contou no ábaco. As contas da partida continuam as mesmas.
+          Limpar tudo apaga as cores e o ábaco nesta fase. Voltar à fase 1 faz o mesmo e começa de novo no primeiro
+          desenho, com as mesmas contas de operação.
         </p>
         <div className="dialog-actions">
           <button type="button" className="ghost" onClick={onCancel}>
@@ -36,6 +39,9 @@ export function ClearProgressDialog({
           </button>
           <button type="button" className="danger" onClick={onConfirm}>
             Limpar tudo
+          </button>
+          <button type="button" className="danger" onClick={onRestart}>
+            Voltar à fase 1
           </button>
         </div>
       </div>
