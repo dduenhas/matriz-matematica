@@ -7,10 +7,9 @@ type PaletteProps = {
   won: boolean;
   onTool: (tool: string) => void;
   onVerify: () => void;
-  onClear: () => void;
 };
 
-export function Palette({ palette, tool, message, won, onTool, onVerify, onClear }: PaletteProps) {
+export function Palette({ palette, tool, message, won, onTool, onVerify }: PaletteProps) {
   return (
     <aside className="palette" aria-label="Cores dos resultados">
       <div className="swatches">
@@ -44,9 +43,6 @@ export function Palette({ palette, tool, message, won, onTool, onVerify, onClear
         )}
         <button type="button" className="verify" onClick={onVerify} disabled={won}>
           Verifique
-        </button>
-        <button type="button" className="ghost" onClick={onClear} disabled={won}>
-          Limpar
         </button>
       </div>
     </aside>

@@ -118,6 +118,31 @@ h1 {
   height: 26px;
 }
 
+.danger-icon {
+  background: #c62828;
+  border-color: #8e1b1b;
+  color: #fffdf8;
+}
+
+.danger-icon:hover {
+  background: #b71c1c;
+}
+
+.danger {
+  border: 0;
+  border-radius: 14px;
+  min-height: 48px;
+  min-width: 140px;
+  padding: 0 16px;
+  background: #c62828;
+  color: #fffdf8;
+  font-size: 18px;
+}
+
+.danger:hover {
+  background: #b71c1c;
+}
+
 .ghost,
 .verify,
 .choice,
@@ -667,8 +692,7 @@ h1 {
 }
 
 .palette .eraser,
-.palette .verify,
-.palette .ghost {
+.palette .verify {
   width: 100%;
   flex: none;
   min-height: 40px;
@@ -887,7 +911,8 @@ legend {
 }
 
 .dialog-actions .verify,
-.dialog-actions .ghost {
+.dialog-actions .ghost,
+.dialog-actions .danger {
   width: auto;
   min-width: 140px;
 }
@@ -1035,6 +1060,13 @@ html[data-contrast="high"] .abacus,
 html[data-contrast="high"] .grid {
   border-color: #000;
   background: #fff;
+}
+
+html[data-contrast="high"] .danger-icon,
+html[data-contrast="high"] .danger {
+  background: #c62828;
+  border-color: #000;
+  color: #fff;
 }
 
 html[data-contrast="high"] .cell {

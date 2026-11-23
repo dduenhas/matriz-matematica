@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Abacus } from "./components/Abacus";
 import { AccessibilityDialog } from "./components/AccessibilityDialog";
 import { Board } from "./components/Board";
+import { ClearProgressDialog } from "./components/ClearProgressDialog";
 import { MagicReveal } from "./components/MagicReveal";
 import { Palette } from "./components/Palette";
 import { PedagogyDialog } from "./components/PedagogyDialog";
@@ -39,6 +40,7 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pedagogyOpen, setPedagogyOpen] = useState(false);
   const [a11yOpen, setA11yOpen] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
   const [a11y, setA11y] = useState<A11yPrefs>(loadA11y);
   const [magic, setMagic] = useState<"calling" | "revealed" | "seen" | null>(null);
   const [revealFrom, setRevealFrom] = useState<DOMRect | null>(null);
@@ -136,11 +138,17 @@ export function App() {
     }
   }
 
-  function clearPaint() {
-    if (won) return;
+  function clearProgress() {
+    cancelCall();
+    setMagic(null);
+    setRevealFrom(null);
     setPaint(Array(puzzle.cells.length).fill(null));
+    setSelected(null);
     setMarks({});
+    setWon(false);
     setMessage(null);
+    setAbacus([0, 0]);
+    setClearOpen(false);
   }
 
   function castWand(from: DOMRect) {
@@ -227,6 +235,21 @@ export function App() {
               />
             </svg>
           </button>
+          <button
+            type="button"
+            className="icon danger-icon"
+            aria-label="Limpar progresso"
+            aria-haspopup="dialog"
+            aria-expanded={clearOpen}
+            onClick={() => setClearOpen(true)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 6h2v9h-2V9Zm4 0h2v9h-2V9ZM7 9h2v9H7V9Zm-1 12h12l1-11H5l1 11Z"
+              />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -271,7 +294,6 @@ export function App() {
           won={won}
           onTool={setTool}
           onVerify={verify}
-          onClear={clearPaint}
         />
         {settings.operation === "sum" && (
           <Abacus
@@ -288,6 +310,9 @@ export function App() {
 
       {settingsOpen && (
         <SettingsDialog settings={settings} onCancel={() => setSettingsOpen(false)} onApply={start} />
+      )}
+      {clearOpen && (
+        <ClearProgressDialog onCancel={() => setClearOpen(false)} onConfirm={clearProgress} />
       )}
       {magic === "revealed" && art && (
         <MagicReveal
